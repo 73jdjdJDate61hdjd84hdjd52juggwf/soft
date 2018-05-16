@@ -1,0 +1,88 @@
+ 说明:tbUserName={0}&tbPassword={1}&btnLogin={2}是相应控件Name。
+using System;
+using System.Collections.Generic;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Net;
+using System.Text;
+using System.IO;
+using SHDocVw;
+ 
+ 
+namespace WebApplication2
+{
+    public partial class Login1 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+ 
+            CookieContainer cookieContainer = new CookieContainer();
+ 
+            ///////////////////////////////////////////////////
+            // 1.打开 MyLogin.aspx 页面，获得 GetVeiwState & EventValidation
+            ///////////////////////////////////////////////////                
+            // 设置打开页面的参数   
+            string URI = "***";
+            HttpWebRequest request = WebRequest.Create(URI) as HttpWebRequest;
+            request.Method = "GET";
+            request.KeepAlive = false;
+ 
+            // 接收返回的页面
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            System.IO.Stream responseStream = response.GetResponseStream();
+            System.IO.StreamReader reader = new System.IO.StreamReader(responseStream, Encoding.UTF8);
+            string srcString = reader.ReadToEnd();
+ 
+            // 获取页面的 VeiwState                
+            string viewStateFlag = "id=\"__VIEWSTATE\" value=\"";
+            int i = srcString.IndexOf(viewStateFlag) + viewStateFlag.Length;
+            int j = srcString.IndexOf("\"", i);
+            string viewState = srcString.Substring(i, j - i);
+ 
+            // 获取页面的 EventValidation                
+            string eventValidationFlag = "id=\"__EVENTVALIDATION\" value=\"";
+            i = srcString.IndexOf(eventValidationFlag) + eventValidationFlag.Length;
+            j = srcString.IndexOf("\"", i);
+            string eventValidation = srcString.Substring(i, j - i);
+ 
+ 
+            ///////////////////////////////////////////////////
+            // 2.自动填充并提交 MyLogin.aspx 页面
+            ///////////////////////////////////////////////////
+            // 提交按钮的文本
+            string submitButton = "登  录";
+ 
+            // 用户名和密码
+            string userName = "***";
+            string password = "***";
+ 
+            // 将文本转换成 URL 编码字符串
+            viewState = System.Web.HttpUtility.UrlEncode(viewState);
+            eventValidation = System.Web.HttpUtility.UrlEncode(eventValidation);
+            submitButton = System.Web.HttpUtility.UrlEncode(submitButton);
+ 
+            // 要提交的字符串数据。格式形如:user=uesr1&password=123
+            string formatString = "tbUserName={0}&tbPassword={1}&btnLogin={2}&__VIEWSTATE={3}&__EVENTVALIDATION={4}";
+            string postString = string.Format(formatString, userName, password, submitButton, viewState, eventValidation);
+            OpenNewIe(URI, postString);
+ 
+        }
+ 
+        public static void OpenNewIe(string url, string postData)
+        {
+            var ie = new InternetExplorer();
+            object vPost, vHeaders, vFlags, vTargetFrame;
+            vPost = null;
+            vFlags = null;
+            vTargetFrame = null;
+            vHeaders = "Content-Type: application/x-www-form-urlencoded" + Convert.ToChar(10) + Convert.ToChar(13);
+            if (!string.IsNullOrEmpty(postData))
+                vPost = ASCIIEncoding.ASCII.GetBytes(postData);
+            ie.Visible = true;
+            ie.Navigate(url, ref vFlags, ref vTargetFrame, ref vPost, ref vHeaders);
+ 
+        }
+ 
+    }
+}
