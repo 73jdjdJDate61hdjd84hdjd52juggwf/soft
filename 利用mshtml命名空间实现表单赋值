@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Diagnostics;
+using System.IO;
+ 
+using SHDocVw;
+using System.Text;
+using System.Net;
+using mshtml;
+ 
+namespace WebApplication2
+{
+    public partial class login2 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            string URI = "***";
+            var ie = new InternetExplorer();
+            object vPost, vHeaders, vFlags, vTargetFrame;
+            vPost = null;
+            vFlags = null;
+            vTargetFrame = null;
+            vHeaders = "Content-Type: application/x-www-form-urlencoded" + Convert.ToChar(10) + Convert.ToChar(13);
+ 
+            ie.Visible = true;
+            ie.Navigate(URI, ref vFlags, ref vTargetFrame, ref vPost, ref vHeaders);
+            try
+            {
+                System.Threading.Thread.Sleep(1000);
+                HTMLDocument doc = (HTMLDocument)ie.Document;
+                HTMLInputElement keyword = (HTMLInputElement)doc.getElementById("tbUserName");
+                keyword.value = "***";
+ 
+ 
+                HTMLInputElement keyword1 = (HTMLInputElement)doc.getElementById("tbPassword");
+                keyword1.value = "***";
+ 
+                HTMLInputElement submit = (HTMLInputElement)doc.getElementById("btnLogin");
+                submit.click();
+            }
+            catch (Exception)
+            {
+ 
+                return;
+            }
+        }
+    }
+}
